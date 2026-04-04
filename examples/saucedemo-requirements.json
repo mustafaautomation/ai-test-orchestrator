@@ -1,0 +1,36 @@
+[
+  {
+    "id": "REQ-001",
+    "description": "User can log in with valid credentials",
+    "url": "https://www.saucedemo.com",
+    "priority": "critical",
+    "acceptanceCriteria": [
+      "Login form is visible",
+      "standard_user can log in with secret_sauce",
+      "User is redirected to inventory page"
+    ]
+  },
+  {
+    "id": "REQ-002",
+    "description": "Inventory page displays all products",
+    "url": "https://www.saucedemo.com/inventory.html",
+    "priority": "high",
+    "acceptanceCriteria": [
+      "6 products are displayed",
+      "Each product has a name and price",
+      "Add to cart button is available"
+    ]
+  },
+  {
+    "id": "REQ-003",
+    "description": "User can complete checkout flow",
+    "url": "https://www.saucedemo.com",
+    "priority": "critical",
+    "acceptanceCriteria": [
+      "Add product to cart",
+      "Navigate to checkout",
+      "Fill shipping information",
+      "Complete order and see confirmation"
+    ]
+  }
+]
