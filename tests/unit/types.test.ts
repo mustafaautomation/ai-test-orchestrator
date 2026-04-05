@@ -72,6 +72,26 @@ describe('Type validation', () => {
     }
   });
 
+  it('should create valid HealResult', () => {
+    const healed: HealResult = {
+      attempted: true,
+      healed: true,
+      originalError: 'Locator not found',
+      fix: 'Use getByRole',
+      newCode: 'fixed test code',
+    };
+    expect(healed.healed).toBe(true);
+    expect(healed.newCode).toBeDefined();
+
+    const unhealed: HealResult = {
+      attempted: true,
+      healed: false,
+      originalError: 'Unknown',
+      fix: 'Manual fix required',
+    };
+    expect(unhealed.newCode).toBeUndefined();
+  });
+
   it('should support all final statuses', () => {
     const statuses: TestCycleResult['finalStatus'][] = [
       'passed',
