@@ -1,9 +1,14 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
+const ROOT = path.resolve(__dirname, '../..');
+
 describe('CLI integration', () => {
+  beforeAll(() => {
+    execSync('npm run build', { cwd: ROOT, stdio: 'pipe' });
+  });
   it('should show help without errors', () => {
     const output = execSync('node dist/cli.js --help', {
       cwd: path.resolve(__dirname, '../..'),
