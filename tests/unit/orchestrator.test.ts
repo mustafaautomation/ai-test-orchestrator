@@ -1,18 +1,46 @@
 import { describe, it, expect } from 'vitest';
-import { Orchestrator, LLMProvider, TestRunner, TestValidator } from '../../src/pipeline/orchestrator';
+import {
+  Orchestrator,
+  LLMProvider,
+  TestRunner,
+  TestValidator,
+} from '../../src/pipeline/orchestrator';
 import { Requirement, ValidationResult, ExecutionResult } from '../../src/pipeline/types';
 
 const validCode = `import { test, expect } from '@playwright/test';\ntest.describe('T', () => { test('t', async ({ page }) => { await page.goto('https://example.com'); }); });`;
 
-const mockLLM: LLMProvider = { async generate() { return validCode; } };
-const passingRunner: TestRunner = { async execute(): Promise<ExecutionResult> { return { passed: true, duration: 100, retries: 0 }; } };
-const failingRunner: TestRunner = { async execute(): Promise<ExecutionResult> { return { passed: false, duration: 50, retries: 0, error: 'Locator not found: #missing' }; } };
-const goodValidator: TestValidator = { validate(): ValidationResult { return { valid: true, errors: [], warnings: [] }; } };
-const badValidator: TestValidator = { validate(): ValidationResult { return { valid: false, errors: ['Missing import'], warnings: [] }; } };
+const mockLLM: LLMProvider = {
+  async generate() {
+    return validCode;
+  },
+};
+const passingRunner: TestRunner = {
+  async execute(): Promise<ExecutionResult> {
+    return { passed: true, duration: 100, retries: 0 };
+  },
+};
+const failingRunner: TestRunner = {
+  async execute(): Promise<ExecutionResult> {
+    return { passed: false, duration: 50, retries: 0, error: 'Locator not found: #missing' };
+  },
+};
+const goodValidator: TestValidator = {
+  validate(): ValidationResult {
+    return { valid: true, errors: [], warnings: [] };
+  },
+};
+const badValidator: TestValidator = {
+  validate(): ValidationResult {
+    return { valid: false, errors: ['Missing import'], warnings: [] };
+  },
+};
 
 const req: Requirement = {
-  id: 'REQ-1', description: 'Homepage loads', url: 'https://example.com',
-  priority: 'high', acceptanceCriteria: ['Page loads', 'Title visible'],
+  id: 'REQ-1',
+  description: 'Homepage loads',
+  url: 'https://example.com',
+  priority: 'high',
+  acceptanceCriteria: ['Page loads', 'Title visible'],
 };
 
 describe('Orchestrator', () => {
@@ -50,7 +78,10 @@ describe('Orchestrator', () => {
 
   it('should handle multiple requirements', async () => {
     const orch = new Orchestrator(mockLLM, passingRunner, goodValidator);
-    const report = await orch.runPipeline([req, { ...req, id: 'REQ-2', description: 'Login works' }]);
+    const report = await orch.runPipeline([
+      req,
+      { ...req, id: 'REQ-2', description: 'Login works' },
+    ]);
 
     expect(report.requirements).toBe(2);
     expect(report.passed).toBe(2);

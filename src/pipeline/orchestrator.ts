@@ -1,6 +1,13 @@
 import {
-  Requirement, TestCycleResult, OrchestratorReport, StageStatus, PipelineStage,
-  ValidationResult, ExecutionResult, FailureAnalysis, HealResult,
+  Requirement,
+  TestCycleResult,
+  OrchestratorReport,
+  StageStatus,
+  PipelineStage,
+  ValidationResult,
+  ExecutionResult,
+  FailureAnalysis,
+  HealResult,
 } from './types';
 
 export interface LLMProvider {
@@ -45,7 +52,8 @@ export class Orchestrator {
       executed: cycles.filter((c) => c.execution).length,
       passed: cycles.filter((c) => c.finalStatus === 'passed').length,
       healed: cycles.filter((c) => c.finalStatus === 'healed').length,
-      failed: cycles.filter((c) => c.finalStatus === 'failed' || c.finalStatus === 'unrecoverable').length,
+      failed: cycles.filter((c) => c.finalStatus === 'failed' || c.finalStatus === 'unrecoverable')
+        .length,
       totalDuration: Date.now() - start,
       cycles,
     };
@@ -53,7 +61,11 @@ export class Orchestrator {
 
   async runCycle(requirement: Requirement): Promise<TestCycleResult> {
     const stages: Record<PipelineStage, StageStatus> = {
-      generate: 'pending', validate: 'pending', execute: 'pending', analyze: 'pending', heal: 'pending',
+      generate: 'pending',
+      validate: 'pending',
+      execute: 'pending',
+      analyze: 'pending',
+      heal: 'pending',
     };
 
     // Stage 1: Generate
@@ -71,8 +83,11 @@ export class Orchestrator {
 
     if (!validation.valid) {
       return {
-        requirement, generation: { code, duration: genDuration }, validation,
-        finalStatus: 'failed', stages,
+        requirement,
+        generation: { code, duration: genDuration },
+        validation,
+        finalStatus: 'failed',
+        stages,
       };
     }
 
@@ -85,8 +100,12 @@ export class Orchestrator {
       stages.analyze = 'skipped';
       stages.heal = 'skipped';
       return {
-        requirement, generation: { code, duration: genDuration }, validation, execution,
-        finalStatus: 'passed', stages,
+        requirement,
+        generation: { code, duration: genDuration },
+        validation,
+        execution,
+        finalStatus: 'passed',
+        stages,
       };
     }
 
@@ -101,28 +120,72 @@ export class Orchestrator {
     stages.heal = healing.healed ? 'passed' : 'failed';
 
     return {
-      requirement, generation: { code, duration: genDuration }, validation, execution, analysis, healing,
-      finalStatus: healing.healed ? 'healed' : 'unrecoverable', stages,
+      requirement,
+      generation: { code, duration: genDuration },
+      validation,
+      execution,
+      analysis,
+      healing,
+      finalStatus: healing.healed ? 'healed' : 'unrecoverable',
+      stages,
     };
   }
 
   analyzeFailure(error: string): FailureAnalysis {
     const lowerError = error.toLowerCase();
 
-    if (lowerError.includes('locator') || lowerError.includes('selector') || lowerError.includes('not found')) {
-      return { rootCause: 'Element selector not found', category: 'selector', confidence: 0.85, suggestedFix: 'Use more resilient selectors (getByRole, getByText)', isFlaky: false };
+    if (
+      lowerError.includes('locator') ||
+      lowerError.includes('selector') ||
+      lowerError.includes('not found')
+    ) {
+      return {
+        rootCause: 'Element selector not found',
+        category: 'selector',
+        confidence: 0.85,
+        suggestedFix: 'Use more resilient selectors (getByRole, getByText)',
+        isFlaky: false,
+      };
     }
     if (lowerError.includes('timeout') || lowerError.includes('waiting')) {
-      return { rootCause: 'Element or navigation timeout', category: 'timing', confidence: 0.8, suggestedFix: 'Add explicit waits or increase timeout', isFlaky: true };
+      return {
+        rootCause: 'Element or navigation timeout',
+        category: 'timing',
+        confidence: 0.8,
+        suggestedFix: 'Add explicit waits or increase timeout',
+        isFlaky: true,
+      };
     }
-    if (lowerError.includes('expect') || lowerError.includes('assert') || lowerError.includes('tobetruthy')) {
-      return { rootCause: 'Assertion mismatch', category: 'assertion', confidence: 0.9, suggestedFix: 'Update expected value or use more flexible matcher', isFlaky: false };
+    if (
+      lowerError.includes('expect') ||
+      lowerError.includes('assert') ||
+      lowerError.includes('tobetruthy')
+    ) {
+      return {
+        rootCause: 'Assertion mismatch',
+        category: 'assertion',
+        confidence: 0.9,
+        suggestedFix: 'Update expected value or use more flexible matcher',
+        isFlaky: false,
+      };
     }
     if (lowerError.includes('econnrefused') || lowerError.includes('network')) {
-      return { rootCause: 'Network/environment issue', category: 'environment', confidence: 0.7, suggestedFix: 'Check if target URL is accessible', isFlaky: true };
+      return {
+        rootCause: 'Network/environment issue',
+        category: 'environment',
+        confidence: 0.7,
+        suggestedFix: 'Check if target URL is accessible',
+        isFlaky: true,
+      };
     }
 
-    return { rootCause: 'Unknown failure', category: 'unknown', confidence: 0.3, suggestedFix: 'Manual investigation required', isFlaky: false };
+    return {
+      rootCause: 'Unknown failure',
+      category: 'unknown',
+      confidence: 0.3,
+      suggestedFix: 'Manual investigation required',
+      isFlaky: false,
+    };
   }
 
   private async attemptHeal(
@@ -131,7 +194,12 @@ export class Orchestrator {
     requirement: Requirement,
   ): Promise<HealResult> {
     if (analysis.category === 'environment') {
-      return { attempted: false, healed: false, originalError: analysis.rootCause, fix: 'Environment issue — cannot self-heal' };
+      return {
+        attempted: false,
+        healed: false,
+        originalError: analysis.rootCause,
+        fix: 'Environment issue — cannot self-heal',
+      };
     }
 
     for (let attempt = 0; attempt < this.maxHealAttempts; attempt++) {
@@ -142,12 +210,23 @@ export class Orchestrator {
       if (validation.valid) {
         const execution = await this.runner.execute(`heal-${requirement.id}-${attempt}.spec.ts`);
         if (execution.passed) {
-          return { attempted: true, healed: true, originalError: analysis.rootCause, fix: analysis.suggestedFix, newCode };
+          return {
+            attempted: true,
+            healed: true,
+            originalError: analysis.rootCause,
+            fix: analysis.suggestedFix,
+            newCode,
+          };
         }
       }
     }
 
-    return { attempted: true, healed: false, originalError: analysis.rootCause, fix: 'Self-heal attempts exhausted' };
+    return {
+      attempted: true,
+      healed: false,
+      originalError: analysis.rootCause,
+      fix: 'Self-heal attempts exhausted',
+    };
   }
 
   private buildGenerationPrompt(requirement: Requirement): string {
