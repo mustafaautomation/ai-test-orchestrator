@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/mustafaautomation/ai-test-orchestrator/actions/workflows/ci.yml/badge.svg)](https://github.com/mustafaautomation/ai-test-orchestrator/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 
 End-to-end AI QA orchestration pipeline. Takes requirements in natural language, generates Playwright tests via LLM, validates syntax, executes tests, analyzes failures, and self-heals broken tests automatically.
 
