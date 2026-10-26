@@ -4,29 +4,39 @@
   "description": "End-to-end AI QA orchestration — generate, validate, execute, analyze, and self-heal tests",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "bin": { "ato": "dist/cli.js" },
+  "bin": {
+    "ato": "dist/cli.js"
+  },
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
-    "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format:check": "prettier --check \"**/*.ts\"",
     "typecheck": "tsc --noEmit"
   },
   "author": "Quvantic <info@quvantic.com> (https://quvantic.com)",
   "license": "MIT",
-  "repository": { "type": "git", "url": "https://github.com/mustafaautomation/ai-test-orchestrator.git" },
-  "homepage": "https://github.com/mustafaautomation/ai-test-orchestrator#readme",
-  "dependencies": { "commander": "^12.1.0" },
-  "devDependencies": {
-    "@types/node": "^22.10.0",
-    "@typescript-eslint/eslint-plugin": "^7.0.0",
-    "@typescript-eslint/parser": "^7.0.0",
-    "eslint": "^8.57.0",
-    "eslint-config-prettier": "^9.1.0",
-    "prettier": "^3.3.0",
-    "typescript": "^5.7.0",
-    "vitest": "^3.0.0"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mustafaautomation/ai-test-orchestrator.git"
   },
-  "engines": { "node": ">=18.0.0" }
+  "homepage": "https://github.com/mustafaautomation/ai-test-orchestrator#readme",
+  "dependencies": {
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^24.19.2",
+    "eslint": "^10.13.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.10",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.0",
+    "vitest": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=22"
+  }
 }
